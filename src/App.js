@@ -4,7 +4,9 @@ import ItemList from './components/ItemList';
 function App() {
   return (
     <div className="App">
-      <ItemList />
+      <div>
+        <h1>University Marketplace UC</h1>
+      </div>
     </div>
   );
 }
