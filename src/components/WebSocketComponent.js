@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 
 const WebSocketComponent = () => {
   const [message, setMessage] = useState('');
@@ -8,7 +9,7 @@ const WebSocketComponent = () => {
     let ws;
 
     const connectWebSocket = () => {
-      ws = new WebSocket('ws://localhost:8000/ws');
+      ws = new WebSocket(API_URL + 'ws');
 
       ws.onopen = () => {
         console.log('WebSocket Connected');
