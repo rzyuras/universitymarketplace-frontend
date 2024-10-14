@@ -9,7 +9,7 @@ const WebSocketComponent = () => {
     let ws;
 
     const connectWebSocket = () => {
-      ws = new WebSocket(API_URL + 'ws');
+      ws = new WebSocket(API_URL + '/ws');
 
       ws.onopen = () => {
         console.log('WebSocket Connected');
