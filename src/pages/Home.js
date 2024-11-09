@@ -21,7 +21,7 @@ const Home = () => {
       <h3>
         {isAuth === "true"
           ? '¡Disfruta del material de estudio disponible para ti!'
-          : '¡Inicia sesión para apostar por tus equipos favoritos!'}
+          : '¡Inicia sesión ver todo el material de estudio disponible!'}
       </h3>
       <WebSocketComponent />
       {isAuth === "false" && <LoginButton />}
