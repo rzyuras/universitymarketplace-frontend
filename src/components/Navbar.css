@@ -1,57 +1,101 @@
 .navbar {
-    background-color: #333; 
-    color: white;
-    padding: 1rem;
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 100%; 
-    height: 50px;
-    z-index: 1000; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex; 
-    align-items: center; 
-    text-shadow: none;
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr); /* Modificado */
+  align-items: center;
+}
+
+.navbar-left {
+  justify-self: end; /* Cambiado de start a end */
+  padding-right: 50px; /* Añadido */
+}
+
+.navbar-center {
+  justify-self: center;
+}
+
+.navbar-right {
+  justify-self: start; /* Cambiado de end a start */
+  padding-left: 50px; /* Añadido */
+  display: flex;
+  gap: 1rem;
+}
+
+.navbar-logo {
+  font-size: 24px;
+  opacity: 0.8;
+}
+
+.navbar-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-around;
+}
+
+.navbar li {
+  display: inline;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+}
+
+.navbar a:hover {
+  background-color: #555;
+}
+
+.navbar button {
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+  box-shadow: none;
+}
+
+.navbar button:hover {
+  background-color: #555;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar-title {
+      font-size: 1rem;
   }
   
-  .navbar-logo {
-    font-size: 3rem; 
-    margin-top: 10px;
-    opacity: 0.8;
-  }
-  
-  .navbar ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex; 
-    justify-content: space-around; 
-    flex-grow: 1; 
-  }
-  
-  .navbar li {
-    display: inline;
-  }
-  
-  .navbar a {
-    color: white; 
-    text-decoration: none; 
-    padding: 0.5rem 1rem;
-  }
-  
-  .navbar a:hover {
-    background-color: #555; 
+  .navbar {
+      padding: 0.5rem;
   }
   
   .navbar button {
-    color: white; 
-    background: none;
-    border: none; 
-    cursor: pointer;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-    box-shadow: none;
+      padding: 0.3rem 0.8rem;
   }
-  
-  .navbar button:hover {
-    background-color: #555; 
-  }
+}

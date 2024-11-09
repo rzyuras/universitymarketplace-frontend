@@ -11,22 +11,18 @@ const Navbar = () => {
 
     return (
         <nav className="navbar">
-            <div className="navbar-logo">
-                <FaFutbol />
+            <div className="navbar-left">
+                <button onClick={() => navigate('/')}>Inicio</button>
             </div>
-            <ul className="navbar-list">
-                <li className="navbar-item">
-                    <button onClick={() => navigate('/')}>Inicio</button>
-                </li>
-                <li className="navbar-item">
-                    <button onClick={() => navigate('/perfil')}>Perfil</button>
-                </li>
-                {isAuthenticated ? (
-                    <li className="navbar-item">
-                        <LogoutButton />
-                    </li>
-                ) : null}
-            </ul>
+            
+            <div className="navbar-center">
+                <span className="navbar-title">Marketplace Universitario</span>
+            </div>
+            
+            <div className="navbar-right">
+                <button onClick={() => navigate('/perfil')}>Perfil</button>
+                {isAuthenticated && <LogoutButton />}
+            </div>
         </nav>
     );
 };
