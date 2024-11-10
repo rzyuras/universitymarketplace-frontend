@@ -11,8 +11,10 @@ const Profile = () => {
     return (
         isAuthenticated !== '' ? (
         <div style={{marginTop: '80px'}}>
-        <img src={user?.picture} alt={user?.name} />
-        <h2>{user?.name}</h2>
+            <h1>Perfil</h1>
+            <img src={user?.picture} alt={user?.name} />
+            <h2>Nombre: {user?.name}</h2>
+            <h2>Email: {user?.email}</h2>
         </div>
         ) : null
     );

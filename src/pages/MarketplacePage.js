@@ -284,6 +284,15 @@ const MarketplacePage = () => {
     setSelectedItem(item);
     setSelectedType(type);
     setIsModalOpen(true);
+    // Aqui hay que agregar la tutoria o descargar el material de estudio
+    if (type === "tutor") {
+      console.log("Agendar tutoria");
+      console.log("item", item);
+    }
+    else {
+      console.log("Descargar material de estudio");
+      console.log("item", item);
+    }
   };
 
   const allProducts = [
