@@ -1,30 +1,28 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import LoginButton from '../components/LoginButton';
-import WebSocketComponent  from '../components/WebSocketComponent';
-import { useAuth0 } from '@auth0/auth0-react';
+import WebSocketComponent from '../components/WebSocketComponent';
 import { FaFutbol } from 'react-icons/fa';
+import { Navigate } from 'react-router-dom';
 
 const Home = () => {
-  const { isAuthenticated } = useAuth0();
   const isAuth = localStorage.getItem('isAuth');
 
-  useEffect(() => {
-    console.log('isAuthenticated:', isAuth);
-    }, [isAuthenticated]);
+  // Si el usuario está autenticado, redirigir al marketplace
+  if (isAuth === "true") {
+    return <Navigate to="/marketplace" replace />;
+  }
 
   return (
     <div style={{ textAlign: 'center', padding: '20px' }}>
       <h1>
-        {isAuth === "false" ? <FaFutbol style={{ marginRight: '10px' }} /> : null}
-        {isAuth === "true" ? '¡Bienvenido de nuevo!' : '¡Bienvenido a University Marketplace!'}
+        <FaFutbol style={{ marginRight: '10px' }} />
+        ¡Bienvenido a University Marketplace!
       </h1>
       <h3>
-        {isAuth === "true"
-          ? '¡Disfruta del material de estudio disponible para ti!'
-          : '¡Inicia sesión ver todo el material de estudio disponible!'}
+        ¡Inicia sesión para ver todo el material de estudio disponible!
       </h3>
       <WebSocketComponent />
-      {isAuth === "false" && <LoginButton />}
+      <LoginButton />
     </div>
   );
 };
