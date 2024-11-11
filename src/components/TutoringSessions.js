@@ -10,21 +10,16 @@ const TutoringSessions = ({ tutorId }) => {
     
     try {
       const now = new Date();
-
+  
       // Generate random date for next year (2025)
       const getRandomDate = () => {
-        // Create date object for Jan 1, 2025
         const startOf2025 = new Date(2025, 0, 1);
-        // Create date object for Dec 31, 2025
         const endOf2025 = new Date(2025, 11, 31);
         
-        // Get random timestamp between start and end of 2025
         const randomTimestamp = startOf2025.getTime() + Math.random() * (endOf2025.getTime() - startOf2025.getTime());
         
-        // Create new date from random timestamp
         const randomDate = new Date(randomTimestamp);
         
-        // Set random hour between 9 AM and 5 PM
         randomDate.setHours(9 + Math.floor(Math.random() * 8));
         randomDate.setMinutes(Math.floor(Math.random() * 60));
         randomDate.setSeconds(0);
@@ -33,7 +28,6 @@ const TutoringSessions = ({ tutorId }) => {
         return randomDate;
       };
       
-      // Function to convert Date to naive ISO string (without timezone)
       const toNaiveISOString = (date) => {
         return date.getFullYear() + '-' +
           String(date.getMonth() + 1).padStart(2, '0') + '-' +
@@ -45,7 +39,7 @@ const TutoringSessions = ({ tutorId }) => {
       
       const sessionStart = getRandomDate();
       const sessionEnd = new Date(sessionStart);
-      sessionEnd.setHours(sessionEnd.getHours() + 10);
+      sessionEnd.setHours(sessionEnd.getHours() + 1); // Cambiado de 10 a 1 hora
       
       const sessionData = {
         course: "Test Course",
@@ -55,34 +49,24 @@ const TutoringSessions = ({ tutorId }) => {
         location: "Online"
       };
       
-      console.log(sessionData);
       console.log('Sending data:', sessionData);
       const params = new URLSearchParams({ tutor_id: 1 });
-
-
-      const response = await axios.post(`http://localhost:8000/tutoring-sessions/?${params}`, {
-        course: "Test Course",
-        start_time: toNaiveISOString(sessionStart),
-        end_time: toNaiveISOString(sessionEnd),
-        description: "Test session",
-        location: "Online"
-      });
-      
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Server error response:', errorData);
-        throw new Error(errorData.detail || 'Failed to create session');
-      }
-
-      const newSession = await response.json();
-      console.log('Created session:', newSession);
-      
-      setSessions(prev => [...prev, newSession]);
+  
+      // Usar la respuesta de Axios directamente
+      const response = await axios.post(
+        `http://localhost:8000/tutoring-sessions/?${params}`, 
+        sessionData
+      );
+  
+      // Axios ya parsea la respuesta JSON automáticamente
+      console.log('Created session:', response.data);
+      setSessions(prev => [...prev, response.data]);
       setShowForm(false);
+  
     } catch (error) {
       console.error('Error creating session:', error);
-      alert('Error creating session: ' + error.message);
+      // Mejorar el mensaje de error
+      alert('Error creating session: ' + (error.response?.data?.detail || error.message));
     }
   };
 
