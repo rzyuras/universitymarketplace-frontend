@@ -7,6 +7,7 @@ import MarketplacePage from './pages/MarketplacePage';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './pages/ProtectedRoute';
 import { useAuth0 } from '@auth0/auth0-react';
+import CreateProductPage from './pages/CreateProductPage';
 
 function App() {
   const { isAuthenticated } = useAuth0();
@@ -25,6 +26,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/perfil" element={<ProfilePage />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/crear-producto" element={<CreateProductPage />} />
         </Route>
       </Routes>
     </>
