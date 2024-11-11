@@ -18,6 +18,14 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
+
+    - name: Create env file
+      run: |
+        cat << EOF > .env
+        REACT_APP_AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+        REACT_APP_AUTH0_CLIENT_ID=${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
+        REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
+        EOF
     
     - name: Install dependencies
       run: npm install
