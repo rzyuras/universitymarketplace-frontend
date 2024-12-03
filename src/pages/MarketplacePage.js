@@ -1,161 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth0 } from "@auth0/auth0-react";
 import './MarketplaceStyles.css';
-
-const mockTutors = [
-  {
-    'course': 'Mathematics',
-    'start_time': '2024-11-10T12:49:37.365260',
-    'end_time': '2024-11-10T13:49:37.365260',
-    'description': 'Clases de cálculo diferencial e integral. Preparación para exámenes y ayuda con tareas.',
-    'location': 'Library Room 1',
-    'id': 1,
-    'tutor_id': 1,
-    'student_id': null,
-    'is_booked': false
-  },
-  {
-    'course': 'Physics',
-    'start_time': '2024-11-11T14:00:00.000000',
-    'end_time': '2024-11-11T15:30:00.000000',
-    'description': 'Tutoría de física mecánica. Enfoque en cinemática y dinámica.',
-    'location': 'Library Room 2',
-    'id': 2,
-    'tutor_id': 2,
-    'student_id': null,
-    'is_booked': false
-  },
-  {
-    'course': 'Chemistry',
-    'start_time': '2024-11-12T10:00:00.000000',
-    'end_time': '2024-11-12T11:30:00.000000',
-    'description': 'Química orgánica: nomenclatura y reacciones principales.',
-    'location': 'Science Building 305',
-    'id': 3,
-    'tutor_id': 3,
-    'student_id': null,
-    'is_booked': false
-  },
-  {
-    'course': 'Programming',
-    'start_time': '2024-11-13T15:00:00.000000',
-    'end_time': '2024-11-13T16:30:00.000000',
-    'description': 'Introducción a Python y estructuras de datos básicas.',
-    'location': 'Online',
-    'id': 4,
-    'tutor_id': 4,
-    'student_id': null,
-    'is_booked': false
-  },
-  {
-    'course': 'Statistics',
-    'start_time': '2024-11-14T11:00:00.000000',
-    'end_time': '2024-11-14T12:30:00.000000',
-    'description': 'Estadística descriptiva y probabilidad básica.',
-    'location': 'Math Building 201',
-    'id': 5,
-    'tutor_id': 5,
-    'student_id': null,
-    'is_booked': false
-  },
-  {
-    'course': 'Biology',
-    'start_time': '2024-11-15T13:00:00.000000',
-    'end_time': '2024-11-15T14:30:00.000000',
-    'description': 'Biología celular y molecular. Preparación para examen final.',
-    'location': 'Science Lab 102',
-    'id': 6,
-    'tutor_id': 6,
-    'student_id': null,
-    'is_booked': false
-  },
-  {
-    'course': 'Calculus',
-    'start_time': '2024-11-16T09:00:00.000000',
-    'end_time': '2024-11-16T10:30:00.000000',
-    'description': 'Cálculo multivariable y aplicaciones.',
-    'location': 'Online',
-    'id': 7,
-    'tutor_id': 7,
-    'student_id': null,
-    'is_booked': false
-  }
-];
-
-// Datos de apuntes
-const mockNotes = [
-  {
-    'title': 'Advanced Math Notes',
-    'course': 'Mathematics',
-    'id': 1,
-    'file_path': 'uploads/notes/math_advanced.pdf',
-    'upload_date': '2024-11-09T15:36:27.528716',
-    'owner_id': 1
-  },
-  {
-    'title': 'Chemistry Lab Guide',
-    'course': 'Chemistry',
-    'id': 2,
-    'file_path': 'uploads/notes/chem_lab.pdf',
-    'upload_date': '2024-11-09T14:30:00.000000',
-    'owner_id': 2
-  },
-  {
-    'title': 'Physics Mechanics Summary',
-    'course': 'Physics',
-    'id': 3,
-    'file_path': 'uploads/notes/physics_mech.pdf',
-    'upload_date': '2024-11-08T10:15:00.000000',
-    'owner_id': 3
-  },
-  {
-    'title': 'Programming in Python Guide',
-    'course': 'Programming',
-    'id': 4,
-    'file_path': 'uploads/notes/python_guide.pdf',
-    'upload_date': '2024-11-07T16:45:00.000000',
-    'owner_id': 4
-  },
-  {
-    'title': 'Statistics Formulas',
-    'course': 'Statistics',
-    'id': 5,
-    'file_path': 'uploads/notes/stats_formulas.pdf',
-    'upload_date': '2024-11-06T11:20:00.000000',
-    'owner_id': 5
-  },
-  {
-    'title': 'Biology Cell Structure',
-    'course': 'Biology',
-    'id': 6,
-    'file_path': 'uploads/notes/bio_cell.pdf',
-    'upload_date': '2024-11-05T09:30:00.000000',
-    'owner_id': 6
-  },
-  {
-    'title': 'Calculus Integration Techniques',
-    'course': 'Mathematics',
-    'id': 7,
-    'file_path': 'uploads/notes/calc_integration.pdf',
-    'upload_date': '2024-11-04T14:15:00.000000',
-    'owner_id': 7
-  },
-  {
-    'title': 'Organic Chemistry Reactions',
-    'course': 'Chemistry',
-    'id': 8,
-    'file_path': 'uploads/notes/organic_chem.pdf',
-    'upload_date': '2024-11-03T13:45:00.000000',
-    'owner_id': 8
-  },
-  {
-    'title': 'Data Structures Notes',
-    'course': 'Programming',
-    'id': 9,
-    'file_path': 'uploads/notes/data_structures.pdf',
-    'upload_date': '2024-11-02T15:30:00.000000',
-    'owner_id': 9
-  }
-];
 
 const ProductCard = ({ item, type, onViewDetails }) => {
   const formatDate = (dateString) => {
@@ -201,7 +46,7 @@ const ProductCard = ({ item, type, onViewDetails }) => {
   );
 };
 
-const ProductModal = ({ item, type, isOpen, onClose }) => {
+const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) => {
   if (!isOpen) return null;
 
   const formatDate = (dateString) => {
@@ -254,7 +99,10 @@ const ProductModal = ({ item, type, isOpen, onClose }) => {
                   Fin: {formatDate(item.end_time)}
                 </p>
               </div>
-              <button className="modal-action schedule-button">
+              <button 
+                className="modal-action schedule-button"
+                onClick={() => onSchedule(item)}
+              >
                 Agendar Tutoría
               </button>
             </>
@@ -264,7 +112,10 @@ const ProductModal = ({ item, type, isOpen, onClose }) => {
                 <h3 className="modal-info-title">Fecha de subida</h3>
                 <p className="modal-info-content">{formatDate(item.upload_date)}</p>
               </div>
-              <button className="modal-action download-button">
+              <button 
+                className="modal-action download-button"
+                onClick={() => onDownload(item)}
+              >
                 Descargar Apunte
               </button>
             </>
@@ -276,42 +127,170 @@ const ProductModal = ({ item, type, isOpen, onClose }) => {
 };
 
 const MarketplacePage = () => {
+  const [products, setProducts] = useState({ notes: [], tutorings: [] });
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    type: 'all',
+    course: '',
+    search: ''
+  });
+  const { user } = useAuth0();
 
-  const handleViewDetails = (item, type) => {
-    setSelectedItem(item);
-    setSelectedType(type);
-    setIsModalOpen(true);
-    // Aqui hay que agregar la tutoria o descargar el material de estudio
-    if (type === "tutor") {
-      console.log("Agendar tutoria");
-      console.log("item", item);
-    }
-    else {
-      console.log("Descargar material de estudio");
-      console.log("item", item);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const [notesRes, tutoringsRes] = await Promise.all([
+          fetch('https://universitymarketplace-backend.onrender.com/notes/'),
+          fetch('https://universitymarketplace-backend.onrender.com/tutoring-sessions/')
+        ]);
+
+        if (!notesRes.ok || !tutoringsRes.ok) throw new Error('Error fetching data');
+
+        const [notes, tutorings] = await Promise.all([
+          notesRes.json(),
+          tutoringsRes.json()
+        ]);
+
+        setProducts({ notes, tutorings });
+      } catch (err) {
+        setError('Error cargando productos');
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleDownload = async (note) => {
+    try {
+      const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/${note.id}/download`);
+      if (!response.ok) throw new Error('Error downloading file');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = note.title;
+      a.click();
+    } catch (err) {
+      setError('Error al descargar el archivo');
     }
   };
 
-  const allProducts = [
-    ...mockTutors.map(item => ({ item, type: 'tutor' })),
-    ...mockNotes.map(item => ({ item, type: 'note' }))
-  ];
+  const handleSchedule = async (tutoring) => {
+    try {
+      const response = await fetch(`https://universitymarketplace-backend.onrender.com/tutoring-sessions/${tutoring.id}/book`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          student_id: user?.sub
+        })
+      });
+
+      if (!response.ok) throw new Error('Error booking tutoring session');
+      setIsModalOpen(false);
+    } catch (err) {
+      setError('Error al agendar la tutoría');
+    }
+  };
+
+  const filteredProducts = () => {
+    let filtered = [
+      ...products.tutorings.map(item => ({ item, type: 'tutor' })),
+      ...products.notes.map(item => ({ item, type: 'note' }))
+    ];
+
+    // Filtrar por tipo
+    if (filters.type !== 'all') {
+      filtered = filtered.filter(p => p.type === filters.type);
+    }
+
+    // Filtrar por curso
+    if (filters.course && typeof filters.course === 'string') {
+      filtered = filtered.filter(p => 
+        p.item.course && p.item.course.toLowerCase().includes(filters.course.toLowerCase())
+      );
+    }
+
+    // Filtrar por título (búsqueda simple)
+    //if (filters.search && typeof filters.search === 'string' && filters.search.trim()) {
+      //filtered = filtered.filter(p => 
+        //p.item.title && p.item.title.toLowerCase().includes(filters.search.trim().toLowerCase())
+      //);
+    //}
+
+    return filtered;
+};
 
   return (
     <div className="marketplace-container">
+      <div className="filters-section">
+        <select 
+          name="type" 
+          value={filters.type}
+          onChange={handleFilterChange}
+          className="filter-select"
+        >
+          <option value="all">Todos los productos</option>
+          <option value="note">Apuntes</option>
+          <option value="tutor">Tutorías</option>
+        </select>
+
+        <input
+          type="text"
+          name="course"
+          placeholder="Buscar por curso..."
+          value={filters.course}
+          onChange={handleFilterChange}
+          className="filter-input"
+        />
+
+        {/* <input
+          type="text"
+          name="search"
+          placeholder="Buscar por título..."
+          value={filters.search}
+          onChange={handleFilterChange}
+          className="filter-input"
+        /> */}
+      </div>
+
+      {error && <div className="error-message">{error}</div>}
       
       <div className="products-grid">
-        {allProducts.map(({ item, type }) => (
-          <ProductCard
-            key={`${type}-${item.id}`}
-            item={item}
-            type={type}
-            onViewDetails={handleViewDetails}
-          />
-        ))}
+        {filteredProducts().length > 0 ? (
+          filteredProducts().map(({ item, type }) => (
+            <ProductCard
+              key={`${type}-${item.id}`}
+              item={item}
+              type={type}
+              onViewDetails={() => {
+                setSelectedItem(item);
+                setSelectedType(type);
+                setIsModalOpen(true);
+              }}
+            />
+          ))
+        ) : (
+          <div className="no-products-message">
+            {filters.type === 'note' 
+              ? "No hay apuntes disponibles en este momento 😔"
+              : filters.type === 'tutor'
+              ? "No hay tutorías disponibles en este momento 😔"
+              : "No se encontraron productos 😔"}
+          </div>
+        )}
       </div>
 
       <ProductModal
@@ -322,6 +301,8 @@ const MarketplacePage = () => {
           setIsModalOpen(false);
           setSelectedItem(null);
         }}
+        onDownload={handleDownload}
+        onSchedule={handleSchedule}
       />
     </div>
   );
