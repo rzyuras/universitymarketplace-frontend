@@ -8,7 +8,6 @@ import './Navbar.css';
 const Navbar = () => {
     const { isAuthenticated } = useAuth0();
     const isAuth = localStorage.getItem('isAuth');
-
     const navigate = useNavigate();
     console.log("NAVBAR", isAuthenticated, isAuth);
     
@@ -21,14 +20,17 @@ const Navbar = () => {
             <div className="navbar-center">
                 <span className="navbar-title">Marketplace Universitario</span>
             </div>
-            <div className="navbar-left">
-                <button onClick={() => navigate('/tutorias')}>Agregar Tutoria</button>
-                
-            </div>
-            <div className="navbar-right">
-                <button onClick={() => navigate('/perfil')}>Perfil</button>
-                {isAuth && <LogoutButton />}
-            </div>
+            {isAuth == "true" && (
+                <div className="navbar-left">
+                    <button onClick={() => navigate('/tutorias')}>Agregar Tutoria</button>
+                </div>
+            )}
+            {isAuth == "true" && (
+                <div className="navbar-right">
+                    <button onClick={() => navigate('/perfil')}>Perfil</button>
+                    <LogoutButton />
+                </div>
+            )}
         </nav>
     );
 };

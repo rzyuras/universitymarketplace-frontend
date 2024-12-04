@@ -27,6 +27,7 @@ function App() {
           <Route path="/perfil" element={<ProfilePage />} />
           <Route path="/tutorias" element={<TutoringSessions />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
+          
         </Route>
       </Routes>
     </>
