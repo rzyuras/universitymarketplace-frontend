@@ -143,8 +143,10 @@ const MarketplacePage = () => {
     const fetchProducts = async () => {
       try {
         const [notesRes, tutoringsRes] = await Promise.all([
-          fetch('https://universitymarketplace-backend.onrender.com/notes/'),
-          fetch('https://universitymarketplace-backend.onrender.com/tutoring-sessions/')
+          fetch('http://localhost:8000/notes/'),
+          fetch('http://localhost:8000/tutoring-sessions/')
+          // fetch('https://universitymarketplace-backend.onrender.com/notes/'),
+          // fetch('https://universitymarketplace-backend.onrender.com/tutoring-sessions/')
         ]);
 
         if (!notesRes.ok || !tutoringsRes.ok) throw new Error('Error fetching data');

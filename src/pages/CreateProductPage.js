@@ -51,12 +51,18 @@ const CreateProductPage = () => {
         formDataToSend.append('title', formData.title);
         formDataToSend.append('course', formData.course);
         formDataToSend.append('file', formData.file);
+        formDataToSend.append('owner_id', userId.userId);
       
-        const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/?owner_id=${userId}`, {
+        // const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/`, {
+        //   method: 'POST',
+        //   body: formDataToSend,
+        // });
+
+        const response = await fetch(`http://localhost:8000/notes/`, {
           method: 'POST',
           body: formDataToSend,
         });
-      
+
         if (response.status === 413) {
           throw new Error('Archivo demasiado grande');
         }
@@ -74,7 +80,7 @@ const CreateProductPage = () => {
           location: formData.location
         };
 
-        const response = await fetch(`https://universitymarketplace-backend.onrender.com/tutoring-sessions/?tutor_id=${userId}`, {
+        const response = await fetch(`http://localhost:8000/tutoring-sessions/?tutor_id=${userId.userId}`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(tutoringData)
