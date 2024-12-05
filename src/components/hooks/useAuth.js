@@ -8,7 +8,8 @@ export const useAuth = () => {
     const registerUser = async () => {
       if (isAuthenticated && user) {
         try {
-          const response = await fetch('https://universitymarketplace-backend.onrender.com/users/', {
+          //const response = await fetch('https://universitymarketplace-backend.onrender.com/users/', {
+          const response = await fetch('http://localhost:8000/users/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

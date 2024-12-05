@@ -69,26 +69,45 @@
   .note-info p {
     color: #4a4a4a;
   }
-  
-  .delete-button {
-    background: none;
-    border: none;
-    color: #dc3545;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 4px;
+
+  .note-actions {
+    display: flex;
+    gap: 8px;
   }
   
-  .delete-button:hover {
-    background-color: rgba(220, 53, 69, 0.1);
+  .edit-button,
+  .delete-button,
+  .download-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 36px;
+    width: 36px;
+  }
+  
+  .edit-button {
+    background-color: #1a73e8;
+    color: white;
+  }
+  
+  .delete-button {
+    background-color: #dc3545;
+    color: white;
   }
   
   .download-button {
-    background-color: #1a73e8;
+    background-color: #28a745;
     color: white;
-    padding: 10px;
-    font-weight: 500;
-    transition: background-color 0.2s;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .delete-button:hover {
+    background-color: rgba(220, 53, 69, 0.1);
   }
   
   .download-button:hover {
@@ -112,4 +131,9 @@
   .error {
     color: #dc3545;
     margin: 10px 0;
+  }
+
+  .button-icon {
+    width: 16px;
+    height: 16px;
   }

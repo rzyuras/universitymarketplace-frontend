@@ -11,7 +11,8 @@ export const useUser = () => {
     const fetchOrCreateUser = async () => {
       if (isAuthenticated && user?.email) {
         try {
-          const response = await fetch(`https://universitymarketplace-backend.onrender.com/users`);
+          //const response = await fetch(`https://universitymarketplace-backend.onrender.com/users`);
+          const response = await fetch(`http://localhost:8000/users`);
           const data = await response.json();
           
           console.log('Usuario auth0:', user);

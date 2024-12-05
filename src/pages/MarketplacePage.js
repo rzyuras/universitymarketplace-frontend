@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
+import { useUser } from '../components/hooks/useUser';
 import './MarketplaceStyles.css';
 
 const ProductCard = ({ item, type, onViewDetails }) => {
@@ -138,30 +139,31 @@ const MarketplacePage = () => {
     search: ''
   });
   const { user } = useAuth0();
+  const {userId} = useUser();
+
+  const fetchProducts = async () => {
+    try {
+      const [notesRes, tutoringsRes] = await Promise.all([
+        fetch('http://localhost:8000/notes/'),
+        fetch('http://localhost:8000/tutoring-sessions/future')
+        // fetch('https://universitymarketplace-backend.onrender.com/notes/'),
+        // fetch('https://universitymarketplace-backend.onrender.com/tutoring-sessions/')
+      ]);
+
+      if (!notesRes.ok || !tutoringsRes.ok) throw new Error('Error fetching data');
+
+      const [notes, tutorings] = await Promise.all([
+        notesRes.json(),
+        tutoringsRes.json()
+      ]);
+
+      setProducts({ notes, tutorings });
+    } catch (err) {
+      setError('Error cargando productos');
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const [notesRes, tutoringsRes] = await Promise.all([
-          fetch('http://localhost:8000/notes/'),
-          fetch('http://localhost:8000/tutoring-sessions/')
-          // fetch('https://universitymarketplace-backend.onrender.com/notes/'),
-          // fetch('https://universitymarketplace-backend.onrender.com/tutoring-sessions/')
-        ]);
-
-        if (!notesRes.ok || !tutoringsRes.ok) throw new Error('Error fetching data');
-
-        const [notes, tutorings] = await Promise.all([
-          notesRes.json(),
-          tutoringsRes.json()
-        ]);
-
-        setProducts({ notes, tutorings });
-      } catch (err) {
-        setError('Error cargando productos');
-      }
-    };
-
     fetchProducts();
   }, []);
 
@@ -174,7 +176,8 @@ const MarketplacePage = () => {
 
   const handleDownload = async (note) => {
     try {
-      const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/${note.id}/download`);
+      // const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/${note.id}/download`);
+      const response = await fetch(`http://localhost:8000/notes/${note.id}/download`);
       if (!response.ok) throw new Error('Error downloading file');
       
       const blob = await response.blob();
@@ -189,21 +192,31 @@ const MarketplacePage = () => {
   };
 
   const handleSchedule = async (tutoring) => {
+    console.log('Id usuario: ', userId);
+    if (!userId) {
+      setError('Necesitas estar identificado para agendar una tutoría');
+      return;
+    }
+
     try {
-      const response = await fetch(`https://universitymarketplace-backend.onrender.com/tutoring-sessions/${tutoring.id}/book`, {
+      // const response = await fetch(`https://universitymarketplace-backend.onrender.com/tutoring-sessions/${tutoring.id}/book`, {
+      const response = await fetch(`http://localhost:8000/tutoring-sessions/${tutoring.id}/book?student_id=${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          student_id: user?.sub
-        })
       });
 
-      if (!response.ok) throw new Error('Error booking tutoring session');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || 'Error al agendar la tutoría');
+      }
+
       setIsModalOpen(false);
+      // Recargar las tutorías para actualizar el estado
+      fetchProducts();
     } catch (err) {
-      setError('Error al agendar la tutoría');
+      setError(err.message);
     }
   };
 

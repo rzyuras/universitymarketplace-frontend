@@ -95,26 +95,66 @@
     font-size: 0.95em;
   }
   
-  .icon {
-    color: #1a73e8;
-    flex-shrink: 0;
+  .tutoring-actions {
+    display: flex;
+    gap: 8px;
   }
   
-  .delete-button {
+  .info-button, .edit-button {
     background: none;
     border: none;
-    color: #dc3545;
     cursor: pointer;
-    padding: 5px;
+    padding: 8px;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
+    height: 32px;
+    width: 32px;
+    transition: all 0.2s;
   }
   
-  .delete-button:hover {
-    background-color: rgba(220, 53, 69, 0.1);
+  .info-button {
+    color: #1a73e8;
+    background-color: rgba(26, 115, 232, 0.1);
+  }
+  
+  .edit-button {
+    color: #1a73e8;
+    background-color: rgba(26, 115, 232, 0.1);
+  }
+  
+  .tutoring-actions .delete-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    height: auto;
+    width: auto;
+    font-weight: 500;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  
+  .info-button:hover {
+    background-color: rgba(26, 115, 232, 0.2);
+  }
+  
+  .edit-button:hover {
+    background-color: rgba(26, 115, 232, 0.2);
+  }
+  
+  .tutoring-actions .delete-button:hover {
+    background-color: #c82333;
+  }
+  
+  .icon {
+    color: #1a73e8;
+    flex-shrink: 0;
   }
   
   .error {
@@ -125,27 +165,28 @@
     border-radius: 4px;
     text-align: center;
   }
-
-  .tutoring-actions {
-    display: flex;
-    gap: 8px;
-  }
   
-  .info-button {
-    background: none;
-    border: none;
-    color: #1a73e8;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 4px;
+  /* Estilos para el modal de edición */
+  .edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
-    align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
+    align-items: center;
+    z-index: 1100;
   }
   
-  .info-button:hover {
-    background-color: rgba(26, 115, 232, 0.1);
+  .edit-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
   }
   
   .description-modal {
@@ -177,4 +218,61 @@
   .description-info p {
     margin: 10px 0;
     line-height: 1.5;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  
+  .save-button, .cancel-button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .save-button {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+  }
+  
+  .save-button:hover {
+    background-color: #1557b0;
+  }
+  
+  .cancel-button {
+    background-color: #f0f2f5;
+    border: 1px solid #ddd;
+    color: #444;
+  }
+  
+  .cancel-button:hover {
+    background-color: #e1e3e6;
   }

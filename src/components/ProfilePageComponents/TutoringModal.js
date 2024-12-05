@@ -1,8 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import { useUser } from './hooks/useUser';
-import { Trash2, Calendar, Clock, MapPin, Info } from 'lucide-react';
+import { useUser } from '../hooks/useUser';
+import { Trash2, Calendar, Clock, MapPin, Info, Pencil } from 'lucide-react';
 import './TutoringModal.css';
 
+const EditSessionModal = ({ session, onClose, onSave }) => {
+    const [formData, setFormData] = useState({
+      course: session.course,
+      description: session.description,
+      location: session.location,
+      start_time: new Date(session.start_time).toISOString().slice(0, 16),
+      end_time: new Date(session.end_time).toISOString().slice(0, 16)
+    });
+  
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      onSave(session.id, formData);
+    };
+
+return (
+    <div className="edit-modal">
+        <div className="edit-content">
+        <button className="close-button" onClick={onClose}>×</button>
+        <h2>Editar Tutoría</h2>
+        <form onSubmit={handleSubmit}>
+            <div className="form-group">
+            <label>Curso:</label>
+            <input
+                type="text"
+                value={formData.course}
+                onChange={(e) => setFormData({...formData, course: e.target.value})}
+                required
+            />
+            </div>
+            <div className="form-group">
+            <label>Descripción:</label>
+            <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                required
+            />
+            </div>
+            <div className="form-group">
+            <label>Ubicación:</label>
+            <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+                required
+            />
+            </div>
+            <div className="form-group">
+            <label>Inicio:</label>
+            <input
+                type="datetime-local"
+                value={formData.start_time}
+                onChange={(e) => setFormData({...formData, start_time: e.target.value})}
+                required
+            />
+            </div>
+            <div className="form-group">
+            <label>Fin:</label>
+            <input
+                type="datetime-local"
+                value={formData.end_time}
+                onChange={(e) => setFormData({...formData, end_time: e.target.value})}
+                required
+            />
+            </div>
+            <div className="form-actions">
+            <button type="button" className="cancel-button" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="save-button">Guardar</button>
+            </div>
+        </form>
+        </div>
+    </div>
+    );
+};
 
 const DescriptionModal = ({ session, onClose }) => (
     <div className="description-modal">
@@ -21,13 +94,13 @@ const DescriptionModal = ({ session, onClose }) => (
     </div>
   );
 
-
 const TutoringModal = ({ onClose }) => {
   const { userId, loading: userLoading, error: userError } = useUser();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedSession, setSelectedSession] = useState(null);
+  const [editingSession, setEditingSession] = useState(null);
 
   useEffect(() => {
     if (userLoading) return;
@@ -38,6 +111,31 @@ const TutoringModal = ({ onClose }) => {
     }
     fetchSessions();
   }, [userId, userLoading, userError]);
+
+  const handleEdit = (session) => {
+    if (session.is_booked || new Date(session.start_time) <= new Date()) {
+      setError('No se puede editar una tutoría que ya pasó o está reservada');
+      return;
+    }
+    setEditingSession(session);
+  };
+
+  const handleSaveEdit = async (sessionId, updatedData) => {
+    try {
+      const response = await fetch(`http://localhost:8000/tutoring-sessions/${sessionId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+      
+      if (!response.ok) throw new Error('Error al actualizar la tutoría');
+      const updatedSession = await response.json();
+      setSessions(sessions.map(s => s.id === sessionId ? updatedSession : s));
+      setEditingSession(null);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const fetchSessions = async () => {
     console.log('ID del usuario:', {userId});
@@ -61,7 +159,7 @@ const TutoringModal = ({ onClose }) => {
         method: 'DELETE',
       });
       
-      if (!response.ok) throw new Error('Error al eliminar la tutoría');
+      if (!response.ok) throw new Error('Error al eliminar la tutoría. Si la tutoría está reservada, no se puede eliminar.');
       setSessions(sessions.filter(session => session.id !== sessionId));
     } catch (err) {
       setError(err.message);
@@ -92,6 +190,13 @@ const TutoringModal = ({ onClose }) => {
                 <div className="tutoring-header">
                   <h3>{session.course}</h3>
                   <div className="tutoring-actions">
+                    <button 
+                        className="edit-button"
+                        onClick={() => handleEdit(session)}
+                        title="Editar tutoría"
+                    >
+                        <Pencil size={16} />
+                    </button>
                     <button 
                       className="info-button"
                       onClick={() => setSelectedSession(session)}
@@ -131,6 +236,13 @@ const TutoringModal = ({ onClose }) => {
           <DescriptionModal 
             session={selectedSession} 
             onClose={() => setSelectedSession(null)} 
+          />
+        )}
+        {editingSession && (
+          <EditSessionModal
+            session={editingSession}
+            onClose={() => setEditingSession(null)}
+            onSave={handleSaveEdit}
           />
         )}
       </div>
