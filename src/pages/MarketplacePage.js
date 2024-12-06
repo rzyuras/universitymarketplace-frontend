@@ -3,6 +3,85 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useUser } from '../components/hooks/useUser';
 import './MarketplaceStyles.css';
 
+
+const RatingModal = ({ noteId, onClose, userId }) => {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!userId) {
+      alert('Usuario no identificado');
+      return;
+    }
+    if (rating === 0) {
+      alert('Por favor selecciona una calificación');
+      return;
+    }
+    
+    try {
+      const ratingRes = await fetch('http://localhost:8000/ratings/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          rating_value: rating,
+          note_id: noteId,
+          user_id: userId.userId
+        })
+      });
+  
+      if (!ratingRes.ok) throw new Error('Error al enviar calificación');
+  
+      if (comment.trim()) {
+        const commentRes = await fetch('http://localhost:8000/comments/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: comment.trim(),
+            note_id: noteId,
+            user_id: userId.userId
+          })
+        });
+        
+        if (!commentRes.ok) throw new Error('Error al enviar comentario');
+      }
+  
+      onClose();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  return (
+    <div className="rating-modal-overlay" onClick={onClose}>
+      < div className="rating-modal" onClick={(e) => e.stopPropagation()}>
+        <h3>Calificar Apunte</h3>
+        <div className="stars-container">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`star ${star <= rating ? 'filled' : ''}`}
+              onClick={() => setRating(star)}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Escribe un comentario (opcional)"
+          className="comment-input"
+        />
+        <div className="rating-actions">
+          <button onClick={handleSubmit}>Enviar</button>
+          <button onClick={onClose}>Cancelar</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ProductCard = ({ item, type, onViewDetails }) => {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-CL', {
@@ -48,7 +127,27 @@ const ProductCard = ({ item, type, onViewDetails }) => {
 };
 
 const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) => {
-  if (!isOpen) return null;
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [ratings, setRatings] = useState([]);
+  const [comments, setComments] = useState([]);
+  const { userId } = useUser();
+
+  useEffect(() => {
+    if (type === 'note' && item?.id) {
+      fetch(`http://localhost:8000/notes/${item.id}/reviews`)
+        .then(res => res.json())
+        .then(setRatings);
+      fetch(`http://localhost:8000/notes/${item.id}/comments`)
+        .then(res => res.json())
+        .then(setComments);
+    }
+  }, [item?.id, type]);
+
+  if (!isOpen || !item) return null;
+
+  const avgRating = ratings.length 
+    ? ratings.reduce((acc, r) => acc + r.rating_value, 0) / ratings.length 
+    : 0;
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-CL', {
@@ -81,7 +180,7 @@ const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) =
             <h3 className="modal-info-title">Curso</h3>
             <p className="modal-info-content">{item.course}</p>
           </div>
-
+  
           {type === 'tutor' ? (
             <>
               <div className="modal-info">
@@ -113,6 +212,29 @@ const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) =
                 <h3 className="modal-info-title">Fecha de subida</h3>
                 <p className="modal-info-content">{formatDate(item.upload_date)}</p>
               </div>
+              
+              <div className="ratings-section">
+                <div className="average-rating">
+                  <span className="stars">{'★'.repeat(Math.round(avgRating))}</span>
+                  <span className="rating-count">({ratings.length} valoraciones)</span>
+                </div>
+                <button 
+                  className="rate-button"
+                  onClick={() => setShowRatingModal(true)}
+                >
+                  Calificar
+                </button>
+                <div className="comments-section">
+                  <h3>Comentarios</h3>
+                  {comments.map(comment => (
+                    <div key={comment.id} className="comment">
+                      <p>{comment.content}</p>
+                      <small>Por: {comment.user?.full_name}</small>
+                    </div>
+                  ))}
+                </div>
+              </div>
+  
               <button 
                 className="modal-action download-button"
                 onClick={() => onDownload(item)}
@@ -123,6 +245,13 @@ const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) =
           )}
         </div>
       </div>
+      {showRatingModal && (
+        <RatingModal 
+          noteId={item.id}
+          onClose={() => setShowRatingModal(false)}
+          userId={userId}
+        />
+      )}
     </div>
   );
 };
