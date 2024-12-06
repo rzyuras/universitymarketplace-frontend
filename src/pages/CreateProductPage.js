@@ -3,6 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from 'react-router-dom';
 import {useUser} from '../components/hooks/useUser';
 import './CreateProductStyles.css';
+import Select from 'react-select';
 
 const CreateProductPage = () => {
   const userId = useUser();
@@ -11,6 +12,7 @@ const CreateProductPage = () => {
   const [productType, setProductType] = useState('note');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [formData, setFormData] = useState({
     course: '',
     title: '',
@@ -20,6 +22,21 @@ const CreateProductPage = () => {
     start_time: '',
     end_time: '',
   });
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/classes/');
+        if (!response.ok) throw new Error('Error al cargar cursos');
+        const data = await response.json();
+        setCourses(data);
+      } catch (err) {
+        setError('Error al cargar los cursos');
+      }
+    };
+  
+    fetchCourses();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -121,12 +138,18 @@ const CreateProductPage = () => {
       <form onSubmit={handleSubmit} className="create-product-form">
         <div className="form-group">
           <label>Curso:</label>
-          <input
-            type="text"
-            name="course"
-            value={formData.course}
-            onChange={handleInputChange}
-            required
+          <Select
+            options={courses.map(course => ({
+              value: course.name,
+              label: `${course.code} - ${course.name}`
+            }))}
+            value={{ value: formData.course, label: courses.find(c => c.name === formData.course)?.name }}
+            onChange={(option) => handleInputChange({
+              target: { name: 'course', value: option.value }
+            })}
+            placeholder="Busca un curso..."
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
 
@@ -142,7 +165,7 @@ const CreateProductPage = () => {
                 required
               />
             </div>
-            <div className="form-group">
+            <div className="form-group file-input-group">
               <label>Archivo:</label>
               <input
                 type="file"
@@ -151,6 +174,11 @@ const CreateProductPage = () => {
                 accept=".pdf,.doc,.docx"
                 required
               />
+              {formData.file && (
+                <div className="selected-file">
+                  Archivo seleccionado: {formData.file.name}
+                </div>
+              )}
             </div>
           </>
         ) : (

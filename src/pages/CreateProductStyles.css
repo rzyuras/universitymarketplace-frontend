@@ -1,82 +1,156 @@
 .create-product-container {
-    max-width: 800px;
-    margin: 80px auto 20px;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .create-product-container h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-  }
-  
-  .product-type-selector {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 30px;
-  }
-  
-  .type-button {
-    padding: 10px 20px;
-    border: 2px solid #1976d2;
-    background: none;
-    color: #1976d2;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-  }
-  
-  .type-button.active {
-    background-color: #1976d2;
-    color: white;
-  }
-  
-  .create-product-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .form-group label {
-    font-weight: 500;
-    color: #333;
-  }
-  
-  .form-group input,
-  .form-group textarea {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  .form-group textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-  
-  .submit-button {
-    padding: 12px;
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .submit-button:hover {
-    background-color: #1565c0;
-  }
+  max-width: 800px;
+  margin: 80px auto 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.create-product-container h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.product-type-selector {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.type-button {
+  padding: 10px 20px;
+  border: 2px solid #1976d2;
+  background: none;
+  color: #1976d2;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.type-button.active {
+  background-color: #1976d2;
+  color: white;
+}
+
+.create-product-form {
+  max-width: 100%;
+  box-sizing: border-box;
+ }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+ width: 100%;
+ box-sizing: border-box;
+ color: white;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.submit-button {
+  padding: 12px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #1565c0;
+}
+
+/* React Select Styles */
+.react-select-container {
+  width: 100%;
+}
+
+.react-select__control {
+  padding: 2px !important;
+  border: 1px solid #e1e3e6 !important;
+  border-radius: 8px !important;
+  background-color: white !important;
+  min-height: 42px !important;
+}
+
+.react-select__control:hover {
+  border-color: #1976d2 !important;
+}
+
+.react-select__control--is-focused {
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1) !important;
+  border-color: #1976d2 !important;
+}
+
+.react-select__menu {
+  background-color: white !important;
+  border: 1px solid #e1e3e6 !important;
+  border-radius: 4px !important;
+  margin-top: 4px !important;
+}
+
+.react-select__option {
+  padding: 10px 12px !important;
+  color: #333 !important;
+  cursor: pointer !important;
+}
+
+.react-select__option--is-selected {
+  background-color: #1976d2 !important;
+  color: white !important;
+}
+
+.react-select__option--is-focused {
+  background-color: rgba(25, 118, 210, 0.1) !important;
+}
+
+.react-select__value-container {
+  padding: 2px 8px !important;
+}
+
+.react-select__single-value {
+  color: #333 !important;
+}
+
+.react-select__placeholder {
+  color: #666 !important;
+}
+
+.file-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+ }
+
+ .selected-file {
+  font-size: 0.9rem;
+  color: #666;
+  padding: 4px 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e1e3e6;
+ }
+
+ input[type="datetime-local"] {
+  color: white;
+  width: 100%;
+ }

@@ -10,36 +10,36 @@ const RatingModal = ({ noteId, onClose, userId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!userId) {
-      alert('Usuario no identificado');
-      return;
-    }
-    if (rating === 0) {
-      alert('Por favor selecciona una calificación');
-      return;
-    }
+
+    console.log('noteId:', noteId);
+    console.log('userId:', userId);
+    console.log('rating:', rating);
+    console.log('comment:', comment);
+    console.log('tutoring_session_id:', null);
     
     try {
-      const ratingRes = await fetch('http://localhost:8000/ratings/', {
+      const ratingRes = await fetch(`http://localhost:8000/ratings/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           rating_value: rating,
+          user_id: userId,
           note_id: noteId,
-          user_id: userId.userId
+          tutoring_session_id: null
         })
       });
-  
+      
       if (!ratingRes.ok) throw new Error('Error al enviar calificación');
   
       if (comment.trim()) {
-        const commentRes = await fetch('http://localhost:8000/comments/', {
+        const commentRes = await fetch(`http://localhost:8000/comments/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             content: comment.trim(),
+            user_id: userId,
             note_id: noteId,
-            user_id: userId.userId
+            tutoring_session_id: null
           })
         });
         
