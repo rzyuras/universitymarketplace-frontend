@@ -18,12 +18,17 @@ const RatingModal = ({ noteId, onClose, userId }) => {
     console.log('tutoring_session_id:', null);
     
     try {
-      const ratingRes = await fetch(`http://localhost:8000/ratings/`, {
+      console.log({ 
+        rating_value: rating,
+        user_id: userId,
+        note_id: noteId,
+        tutoring_session_id: null
+      })
+      const ratingRes = await fetch(`http://localhost:8000/ratings/?user_id=${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          rating_value: rating,
-          user_id: userId,
+          score: rating,
           note_id: noteId,
           tutoring_session_id: null
         })
@@ -32,12 +37,11 @@ const RatingModal = ({ noteId, onClose, userId }) => {
       if (!ratingRes.ok) throw new Error('Error al enviar calificación');
   
       if (comment.trim()) {
-        const commentRes = await fetch(`http://localhost:8000/comments/`, {
+        const commentRes = await fetch(`http://localhost:8000/comments/?user_id=${userId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             content: comment.trim(),
-            user_id: userId,
             note_id: noteId,
             tutoring_session_id: null
           })
@@ -51,6 +55,8 @@ const RatingModal = ({ noteId, onClose, userId }) => {
       alert(err.message);
     }
   };
+
+  
 
   return (
     <div className="rating-modal-overlay" onClick={onClose}>
@@ -144,9 +150,13 @@ const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) =
   }, [item?.id, type]);
 
   if (!isOpen || !item) return null;
+  const calculateAverageOfRatings = (ratings) => {
+      console.log('ratings:', ratings);
+      return ratings.reduce((sum, rating) => sum + rating.score, 0) / ratings.length;
+  };
 
   const avgRating = ratings.length 
-    ? ratings.reduce((acc, r) => acc + r.rating_value, 0) / ratings.length 
+    ? calculateAverageOfRatings(ratings)
     : 0;
 
   const formatDate = (dateString) => {
