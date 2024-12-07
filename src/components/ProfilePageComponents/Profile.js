@@ -7,6 +7,7 @@ const Profile = () => {
 
     localStorage.setItem("isAuth", isAuthenticated.toString());
     localStorage.setItem("user", JSON.stringify(user));
+    console.log("user picture", user.picture);
     
     return (
         isAuthenticated !== '' ? (
