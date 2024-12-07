@@ -19,7 +19,7 @@ function App() {
       <Routes>
         {/* Ruta principal condicional */}
         <Route path="/" element={
-          isAuth === "true" ? <MarketplacePage /> : <Home />
+          isAuthenticated === true ? <MarketplacePage /> : <Home />
         } />
         
         {/* Rutas protegidas */}

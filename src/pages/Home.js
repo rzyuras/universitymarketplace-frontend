@@ -3,12 +3,14 @@ import LoginButton from '../components/LoginButton';
 import WebSocketComponent from '../components/WebSocketComponent';
 import { FaFutbol } from 'react-icons/fa';
 import { Navigate } from 'react-router-dom';
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Home = () => {
   const isAuth = localStorage.getItem('isAuth');
+  const { isAuthenticated } = useAuth0();
 
   // Si el usuario está autenticado, redirigir al marketplace
-  if (isAuth === "true") {
+  if (isAuthenticated === "true") {
     return <Navigate to="/marketplace" replace />;
   }
 

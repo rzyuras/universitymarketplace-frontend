@@ -23,6 +23,7 @@ export const useAuth = () => {
 
           if (response.ok) {
             localStorage.setItem('isAuth', 'true');
+            console.log("Usuario registrado");
           }
         } catch (error) {
           console.error('Error registering user:', error);

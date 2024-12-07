@@ -3,7 +3,6 @@ import { useAuth } from './hooks/useAuth';
 
 const LoginButton = () => {
     const { loginWithRedirect } = useAuth0();
-    useAuth(); // Usa el hook personalizado
 
     const handleLogin = async () => {
         await loginWithRedirect();
