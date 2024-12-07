@@ -27,12 +27,14 @@ const LogoutButton = () => {
             console.log("Agregando...")
             console.log("email", email);
             console.log("name", name);
-            // const response = await axios.post(`${apiUrl}/users`, {
-            //     email: email,
-            //     full_name: name,
-            //     is_tutor: true,
-            // });
-            // console.log("response", response);
+            const response = await axios.post(`${apiUrl}/users`, {
+                email: email,
+                full_name: name,
+                is_tutor: true,
+            });
+            console.log("response", response);
+            localStorage.setItem("user_id", response["data"]["id"]);
+            console.log("user_id", response["data"]["id"]);
         } catch (e) {
             console.error(e);
         }
