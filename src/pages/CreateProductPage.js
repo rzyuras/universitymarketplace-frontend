@@ -26,7 +26,7 @@ const CreateProductPage = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch('http://localhost:8000/classes/');
+        const response = await fetch('http://localhost:8000/courses/');
         if (!response.ok) throw new Error('Error al cargar cursos');
         const data = await response.json();
         setCourses(data);
