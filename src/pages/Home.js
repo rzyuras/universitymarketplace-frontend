@@ -9,7 +9,7 @@ const Home = () => {
   const { isAuthenticated } = useAuth0();
 
   // Si el usuario está autenticado, redirigir al marketplace
-  if (isAuthenticated === "true") {
+  if (isAuthenticated === true) {
     return <Navigate to="/marketplace" replace />;
   }
 

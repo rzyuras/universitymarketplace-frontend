@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useUser } from '../hooks/useUser';
 import './NotesModal.css';
 import { Trash2, Download, Pencil } from 'lucide-react';
+import { useAuth0 } from '@auth0/auth0-react';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const EditNoteModal = ({ note, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -9,6 +12,7 @@ const EditNoteModal = ({ note, onClose, onSave }) => {
     course: { code: note.course.code, name: note.course.name },
     file: null,
   });
+  const { getIdTokenClaims } = useAuth0();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,9 +25,14 @@ const EditNoteModal = ({ note, onClose, onSave }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/notes/${note.id}`, {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      const response = await fetch(`${API_URL}/notes/${note.id}`, {
         method: 'PUT',
         body: data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) throw new Error('Error al actualizar el apunte');
@@ -86,6 +95,7 @@ const NotesModal = ({ onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingNote, setEditingNote] = useState(null);
+  const { getIdTokenClaims } = useAuth0();
 
   useEffect(() => {
     if (userLoading) return;
@@ -101,7 +111,15 @@ const NotesModal = ({ onClose }) => {
   const fetchNotes = async () => {
     const params = new URLSearchParams({ user_id: userId.toString() });
     try {
-      const response = await fetch(`http://localhost:8000/notes/my-notes?${params}`);
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      const response = await fetch(`${API_URL}/notes/my-notes?${params}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok) throw new Error('Error al obtener los apuntes');
       const data = await response.json();
       setNotes(data);
@@ -116,8 +134,13 @@ const NotesModal = ({ onClose }) => {
     if (!window.confirm('¿Estás seguro de que quieres eliminar este apunte?')) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/notes/${noteId}`, {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      const response = await fetch(`${API_URL}/notes/${noteId}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) throw new Error('Error al eliminar el apunte');
@@ -129,7 +152,7 @@ const NotesModal = ({ onClose }) => {
 
   const handleDownload = async (noteId, title) => {
     try {
-      window.open(`http://localhost:8000/notes/${noteId}/download`, '_blank');
+      window.open(`${API_URL}/notes/${noteId}/download`, '_blank');
     } catch (err) {
       setError('Error al descargar el archivo');
     }

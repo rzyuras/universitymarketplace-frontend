@@ -5,9 +5,11 @@ import { useUser } from '../components/hooks/useUser';
 import './CreateProductStyles.css';
 import Select from 'react-select';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const CreateProductPage = () => {
   const userId = useUser();
-  const { user } = useAuth0();
+  const { user, getIdTokenClaims } = useAuth0();
   const navigate = useNavigate();
   const [productType, setProductType] = useState('note');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,7 +28,11 @@ const CreateProductPage = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch('http://localhost:8000/courses/');
+        const tokenClaims = await getIdTokenClaims();
+        const token = tokenClaims?.__raw;
+        const response = await fetch(`${API_URL}/courses/`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         if (!response.ok) throw new Error('Error al cargar cursos');
         const data = await response.json();
         setCourses(data);
@@ -63,6 +69,8 @@ const CreateProductPage = () => {
     setError(null);
 
     try {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
       if (productType === 'note') {
         const formDataToSend = new FormData();
         formDataToSend.append('title', formData.title);
@@ -70,9 +78,12 @@ const CreateProductPage = () => {
         formDataToSend.append('file', formData.file);
         formDataToSend.append('owner_id', userId.userId);
 
-        const response = await fetch('http://localhost:8000/notes/', {
+        const response = await fetch(`${API_URL}/notes/`, {
           method: 'POST',
           body: formDataToSend,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (response.status === 413) {
@@ -95,9 +106,12 @@ const CreateProductPage = () => {
 
         console.log('Datos a enviar:', JSON.stringify(tutoringData));
 
-        const response = await fetch(`http://localhost:8000/tutoring-sessions/?tutor_id=${userId.userId}`, {
+        const response = await fetch(`${API_URL}/tutoring-sessions/?tutor_id=${userId.userId}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify(tutoringData)
         });
 
@@ -154,7 +168,7 @@ const CreateProductPage = () => {
         {productType === 'note' ? (
           <>
             <div className="form-group">
-              <label>Título:</label>
+              <label htmlFor='title'>Título:</label>
               <input
                 type="text"
                 name="title"
@@ -164,7 +178,7 @@ const CreateProductPage = () => {
               />
             </div>
             <div className="form-group file-input-group">
-              <label>Archivo:</label>
+              <label htmlFor='file'>Archivo:</label>
               <input
                 type="file"
                 name="file"
@@ -182,7 +196,7 @@ const CreateProductPage = () => {
         ) : (
           <>
             <div className="form-group">
-              <label>Descripción:</label>
+              <label htmlFor='description'>Descripción:</label>
               <textarea
                 name="description"
                 value={formData.description}

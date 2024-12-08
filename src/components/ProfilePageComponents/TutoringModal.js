@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useUser } from '../hooks/useUser';
 import { Trash2, Calendar, Clock, MapPin, Info, Pencil } from 'lucide-react';
 import './TutoringModal.css';
+import { useAuth0 } from '@auth0/auth0-react';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const EditSessionModal = ({ session, onClose, onSave }) => {
     const [formData, setFormData] = useState({
@@ -101,6 +104,7 @@ const TutoringModal = ({ onClose }) => {
   const [error, setError] = useState(null);
   const [selectedSession, setSelectedSession] = useState(null);
   const [editingSession, setEditingSession] = useState(null);
+  const { getIdTokenClaims } = useAuth0();
 
   useEffect(() => {
     if (userLoading) return;
@@ -122,9 +126,14 @@ const TutoringModal = ({ onClose }) => {
 
   const handleSaveEdit = async (sessionId, updatedData) => {
     try {
-      const response = await fetch(`http://localhost:8000/tutoring-sessions/${sessionId}`, {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      const response = await fetch(`${API_URL}/tutoring-sessions/${sessionId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(updatedData)
       });
       
@@ -140,7 +149,15 @@ const TutoringModal = ({ onClose }) => {
   const fetchSessions = async () => {
     console.log('ID del usuario:', {userId});
     try {
-      const response = await fetch(`http://localhost:8000/tutoring-sessions/my-sessions?user_id=${userId}`);
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      const response = await fetch(`${API_URL}/tutoring-sessions/my-sessions?user_id=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!response.ok) throw new Error('Error al obtener las tutorías');
       const data = await response.json();
       setSessions(data);
@@ -155,8 +172,13 @@ const TutoringModal = ({ onClose }) => {
     if (!window.confirm('¿Estás seguro de que quieres eliminar esta tutoría?')) return;
     
     try {
-      const response = await fetch(`http://localhost:8000/tutoring-sessions/${sessionId}`, {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      const response = await fetch(`${API_URL}/tutoring-sessions/${sessionId}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       
       if (!response.ok) throw new Error('Error al eliminar la tutoría. Si la tutoría está reservada, no se puede eliminar.');

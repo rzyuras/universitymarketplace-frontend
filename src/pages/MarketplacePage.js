@@ -3,10 +3,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useUser } from '../components/hooks/useUser';
 import './MarketplaceStyles.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
 
 const RatingModal = ({ noteId, onClose, userId }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const { getIdTokenClaims } = useAuth0();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,9 +26,14 @@ const RatingModal = ({ noteId, onClose, userId }) => {
         note_id: noteId,
         tutoring_session_id: null
       })
-      const ratingRes = await fetch(`http://localhost:8000/ratings/?user_id=${userId}`, {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      const ratingRes = await fetch(`${API_URL}/ratings/?user_id=${userId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ 
           score: rating,
           note_id: noteId,
@@ -37,9 +44,12 @@ const RatingModal = ({ noteId, onClose, userId }) => {
       if (!ratingRes.ok) throw new Error('Error al enviar calificación');
   
       if (comment.trim()) {
-        const commentRes = await fetch(`http://localhost:8000/comments/?user_id=${userId}`, {
+        const commentRes = await fetch(`${API_URL}/comments/?user_id=${userId}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify({
             content: comment.trim(),
             note_id: noteId,
@@ -55,8 +65,6 @@ const RatingModal = ({ noteId, onClose, userId }) => {
       alert(err.message);
     }
   };
-
-  
 
   return (
     <div className="rating-modal-overlay" onClick={onClose}>
@@ -137,16 +145,30 @@ const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) =
   const [ratings, setRatings] = useState([]);
   const [comments, setComments] = useState([]);
   const { userId } = useUser();
+  const { getIdTokenClaims } = useAuth0();
 
   useEffect(() => {
-    if (type === 'note' && item?.id) {
-      fetch(`http://localhost:8000/notes/${item.id}/reviews`)
-        .then(res => res.json())
-        .then(setRatings);
-      fetch(`http://localhost:8000/notes/${item.id}/comments`)
-        .then(res => res.json())
-        .then(setComments);
-    }
+    const fetchData = async () => {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      if (type === 'note' && item?.id) {
+        fetch(`${API_URL}/notes/${item.id}/reviews`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then(res => res.json())
+          .then(setRatings);
+        fetch(`${API_URL}/notes/${item.id}/comments`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then(res => res.json())
+          .then(setComments);
+      }
+    };
+    fetchData();
   }, [item?.id, type]);
 
   if (!isOpen || !item) return null;
@@ -280,14 +302,24 @@ const MarketplacePage = () => {
     },
     search: ''
   });
-  const { user } = useAuth0();
+  const { user, getIdTokenClaims } = useAuth0();
   const {userId} = useUser();
 
   const fetchProducts = async () => {
     try {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
       const [notesRes, tutoringsRes] = await Promise.all([
-        fetch('http://localhost:8000/notes/'),
-        fetch('http://localhost:8000/tutoring-sessions/future')
+        fetch(`${API_URL}/notes/`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }),
+        fetch(`${API_URL}/tutoring-sessions/future`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         // fetch('https://universitymarketplace-backend.onrender.com/notes/'),
         // fetch('https://universitymarketplace-backend.onrender.com/tutoring-sessions/')
       ]);
@@ -319,8 +351,14 @@ const MarketplacePage = () => {
 
   const handleDownload = async (note) => {
     try {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
       // const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/${note.id}/download`);
-      const response = await fetch(`http://localhost:8000/notes/${note.id}/download`);
+      const response = await fetch(`${API_URL}/notes/${note.id}/download`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       if (!response.ok) throw new Error('Error downloading file');
       
       const blob = await response.blob();
@@ -342,11 +380,14 @@ const MarketplacePage = () => {
     }
 
     try {
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
       // const response = await fetch(`https://universitymarketplace-backend.onrender.com/tutoring-sessions/${tutoring.id}/book`, {
-      const response = await fetch(`http://localhost:8000/tutoring-sessions/${tutoring.id}/book?student_id=${userId}`, {
+      const response = await fetch(`${API_URL}/tutoring-sessions/${tutoring.id}/book?student_id=${userId}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
       });
 

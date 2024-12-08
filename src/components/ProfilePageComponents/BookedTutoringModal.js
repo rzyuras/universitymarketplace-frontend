@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useUser } from '../hooks/useUser';
 import { Calendar, Clock, MapPin, Info } from 'lucide-react';
 import './TutoringModal.css';
+import { useAuth0 } from '@auth0/auth0-react';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const DescriptionModal = ({ session, onClose }) => (
   <div className="description-modal">
@@ -25,6 +28,8 @@ const BookedTutoringModal = ({ onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedSession, setSelectedSession] = useState(null);
+  const { getIdTokenClaims } = useAuth0();
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
     if (userLoading) return;
@@ -39,7 +44,15 @@ const BookedTutoringModal = ({ onClose }) => {
   const fetchSessions = async () => {
     try {
       // Aquí filtramos por student_id en lugar de tutor_id
-      const response = await fetch(`http://localhost:8000/tutoring-sessions?student_id=${userId}&is_booked=true`);
+      const tokenClaims = await getIdTokenClaims();
+      const tokenRaw = tokenClaims?.__raw;
+      setToken(tokenRaw);
+      const response = await fetch(`${API_URL}/tutoring-sessions?student_id=${userId}&is_booked=true`,
+        { headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${token}`
+        } }
+      );
       if (!response.ok) throw new Error('Error al obtener las tutorías');
       const data = await response.json();
       setSessions(data);
@@ -54,10 +67,11 @@ const BookedTutoringModal = ({ onClose }) => {
     if (!window.confirm('¿Estás seguro de que quieres cancelar esta tutoría?')) return;
     
     try {
-      const response = await fetch(`http://localhost:8000/tutoring-sessions/${sessionId}/cancel`, {
+      const response = await fetch(`${API_URL}/tutoring-sessions/${sessionId}/cancel`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
       
