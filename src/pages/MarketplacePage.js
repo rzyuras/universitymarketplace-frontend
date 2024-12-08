@@ -101,7 +101,7 @@ const ProductCard = ({ item, type, onViewDetails }) => {
     <div className="product-card">
       <img 
         src={type === 'tutor' ? '/tutoring.png' : '/notes.png'} 
-        alt={type === 'tutor' ? `Tutoría de ${item.course}` : item.title}
+        alt={type === 'tutor' ? `Tutoría de ${item.course.name}` : item.title}
         className="product-image"
       />
       <div className="product-info">
@@ -109,10 +109,10 @@ const ProductCard = ({ item, type, onViewDetails }) => {
           {type === 'tutor' ? 'Tutoría' : 'Apunte'}
         </span>
         <h3 className="product-title">
-          {type === 'tutor' ? `Tutoría de ${item.course}` : item.title}
+          {type === 'tutor' ? `Tutoría de ${item.course.name}` : item.title}
         </h3>
         <div className="product-details">
-          <p>Curso: {item.course}</p>
+          <p>Curso: {item.course.name}</p>
           <p>
             {type === 'tutor' 
               ? `Fecha: ${formatDate(item.start_time)}`
@@ -174,7 +174,7 @@ const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) =
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
-            {type === 'tutor' ? `Tutoría de ${item.course}` : item.title}
+            {type === 'tutor' ? `Tutoría de ${item.course.name}` : item.title}
           </h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
@@ -182,13 +182,13 @@ const ProductModal = ({ item, type, isOpen, onClose, onDownload, onSchedule }) =
         <div className="modal-body">
           <img 
             src={type === 'tutor' ? '/tutoring.png' : '/notes.png'}
-            alt={type === 'tutor' ? `Tutoría de ${item.course}` : item.title}
+            alt={type === 'tutor' ? `Tutoría de ${item.course.name}` : item.title}
             className="modal-image"
           />
           
           <div className="modal-info">
             <h3 className="modal-info-title">Curso</h3>
-            <p className="modal-info-content">{item.course}</p>
+            <p className="modal-info-content">{item.course.name}</p>
           </div>
   
           {type === 'tutor' ? (
@@ -274,7 +274,10 @@ const MarketplacePage = () => {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     type: 'all',
-    course: '',
+    course: {
+      code: '',
+      name: ''
+    },
     search: ''
   });
   const { user } = useAuth0();
@@ -295,6 +298,7 @@ const MarketplacePage = () => {
         notesRes.json(),
         tutoringsRes.json()
       ]);
+      console.log('notes:', notes);
 
       setProducts({ notes, tutorings });
     } catch (err) {
@@ -371,9 +375,9 @@ const MarketplacePage = () => {
     }
 
     // Filtrar por curso
-    if (filters.course && typeof filters.course === 'string') {
+    if (filters.course.name && typeof filters.course.name === 'string') {
       filtered = filtered.filter(p => 
-        p.item.course && p.item.course.toLowerCase().includes(filters.course.toLowerCase())
+        p.item.course.name && p.item.course.name.toLowerCase().includes(filters.course.name.toLowerCase())
       );
     }
 
@@ -405,7 +409,7 @@ const MarketplacePage = () => {
           type="text"
           name="course"
           placeholder="Buscar por curso..."
-          value={filters.course}
+          value={filters.course.name}
           onChange={handleFilterChange}
           className="filter-input"
         />

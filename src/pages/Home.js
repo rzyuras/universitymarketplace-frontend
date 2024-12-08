@@ -1,6 +1,5 @@
 import React from 'react';
 import LoginButton from '../components/LoginButton';
-import WebSocketComponent from '../components/WebSocketComponent';
 import { FaFutbol } from 'react-icons/fa';
 import { Navigate } from 'react-router-dom';
 import { useAuth0 } from "@auth0/auth0-react";
@@ -23,7 +22,6 @@ const Home = () => {
       <h3>
         ¡Inicia sesión para ver todo el material de estudio disponible!
       </h3>
-      <WebSocketComponent />
       <LoginButton />
     </div>
   );
