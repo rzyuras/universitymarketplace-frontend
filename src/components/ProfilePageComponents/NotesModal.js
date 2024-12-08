@@ -6,15 +6,16 @@ import { Trash2, Download, Pencil } from 'lucide-react';
 const EditNoteModal = ({ note, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     title: note.title,
-    course: note.course,
-    file: null
+    course: { code: note.course.code, name: note.course.name },
+    file: null,
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
     data.append('title', formData.title);
-    data.append('course', formData.course);
+    data.append('course_code', formData.course.code);
+    data.append('course_name', formData.course.name);
     if (formData.file) {
       data.append('file', formData.file);
     }
@@ -22,7 +23,7 @@ const EditNoteModal = ({ note, onClose, onSave }) => {
     try {
       const response = await fetch(`http://localhost:8000/notes/${note.id}`, {
         method: 'PUT',
-        body: data
+        body: data,
       });
 
       if (!response.ok) throw new Error('Error al actualizar el apunte');
@@ -45,16 +46,19 @@ const EditNoteModal = ({ note, onClose, onSave }) => {
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => setFormData({...formData, title: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
             />
           </div>
           <div className="form-group">
-            <label>Curso:</label>
+            <label>Curso (Código - Nombre):</label>
             <input
               type="text"
-              value={formData.course}
-              onChange={(e) => setFormData({...formData, course: e.target.value})}
+              value={`${formData.course.code} - ${formData.course.name}`}
+              onChange={(e) => {
+                const [code, ...nameParts] = e.target.value.split(' - ');
+                setFormData({ ...formData, course: { code, name: nameParts.join(' ') } });
+              }}
               required
             />
           </div>
@@ -62,7 +66,7 @@ const EditNoteModal = ({ note, onClose, onSave }) => {
             <label>Archivo (opcional):</label>
             <input
               type="file"
-              onChange={(e) => setFormData({...formData, file: e.target.files[0]})}
+              onChange={(e) => setFormData({ ...formData, file: e.target.files[0] })}
               accept=".pdf,.doc,.docx"
             />
           </div>
@@ -97,7 +101,6 @@ const NotesModal = ({ onClose }) => {
   const fetchNotes = async () => {
     const params = new URLSearchParams({ user_id: userId.toString() });
     try {
-      //const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/my-notes?${params}`);
       const response = await fetch(`http://localhost:8000/notes/my-notes?${params}`);
       if (!response.ok) throw new Error('Error al obtener los apuntes');
       const data = await response.json();
@@ -111,13 +114,12 @@ const NotesModal = ({ onClose }) => {
 
   const handleDelete = async (noteId) => {
     if (!window.confirm('¿Estás seguro de que quieres eliminar este apunte?')) return;
-    
+
     try {
-      // const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/${noteId}`, {
       const response = await fetch(`http://localhost:8000/notes/${noteId}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) throw new Error('Error al eliminar el apunte');
       setNotes(notes.filter(note => note.id !== noteId));
     } catch (err) {
@@ -127,7 +129,6 @@ const NotesModal = ({ onClose }) => {
 
   const handleDownload = async (noteId, title) => {
     try {
-      //  window.open(`https://universitymarketplace-backend.onrender.com/notes/${noteId}/download`, '_blank');
       window.open(`http://localhost:8000/notes/${noteId}/download`, '_blank');
     } catch (err) {
       setError('Error al descargar el archivo');
@@ -139,9 +140,7 @@ const NotesModal = ({ onClose }) => {
   };
 
   const handleSaveEdit = (updatedNote) => {
-    setNotes(notes.map(note => 
-      note.id === updatedNote.id ? updatedNote : note
-    ));
+    setNotes(notes.map(note => note.id === updatedNote.id ? updatedNote : note));
   };
 
   return (
@@ -158,14 +157,14 @@ const NotesModal = ({ onClose }) => {
                 <div className="note-header">
                   <h3>{note.title}</h3>
                   <div className="note-actions">
-                    <button 
+                    <button
                       className="edit-button"
                       onClick={() => handleEdit(note)}
                       title="Editar apunte"
                     >
                       <Pencil size={16} />
                     </button>
-                    <button 
+                    <button
                       className="delete-button"
                       onClick={() => handleDelete(note.id)}
                       title="Eliminar apunte"
@@ -175,10 +174,10 @@ const NotesModal = ({ onClose }) => {
                   </div>
                 </div>
                 <div className="note-info">
-                  <p><strong>Curso:</strong> {note.course}</p>
+                  <p><strong>Curso:</strong> {note.course.code} - {note.course.name}</p>
                   <p><strong>Fecha:</strong> {new Date(note.upload_date).toLocaleDateString()}</p>
                 </div>
-                <button 
+                <button
                   className="download-button"
                   onClick={() => handleDownload(note.id, note.title)}
                 >
@@ -189,7 +188,7 @@ const NotesModal = ({ onClose }) => {
           </div>
         )}
         {editingNote && (
-          <EditNoteModal 
+          <EditNoteModal
             note={editingNote}
             onClose={() => setEditingNote(null)}
             onSave={handleSaveEdit}

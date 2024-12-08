@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from 'react-router-dom';
-import {useUser} from '../components/hooks/useUser';
+import { useUser } from '../components/hooks/useUser';
 import './CreateProductStyles.css';
 import Select from 'react-select';
 
@@ -34,25 +34,25 @@ const CreateProductPage = () => {
         setError('Error al cargar los cursos');
       }
     };
-  
+
     fetchCourses();
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({...prev, [name]: value}));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
-    setFormData(prev => ({...prev, file: e.target.files[0]}));
+    setFormData(prev => ({ ...prev, file: e.target.files[0] }));
   };
 
-  console.log('ID del usuario a publicar:', {userId});
+  // console.log('ID del usuario a publicar:', { userId });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('Usuario a publicar', userId)
+    console.log('Usuario a publicar', userId);
 
     if (!userId) {
       setError('Error: Usuario no identificado');
@@ -66,16 +66,14 @@ const CreateProductPage = () => {
       if (productType === 'note') {
         const formDataToSend = new FormData();
         formDataToSend.append('title', formData.title);
-        formDataToSend.append('course', formData.course);
+        formDataToSend.append('course_code', formData.course.code);
+        formDataToSend.append('course_name', formData.course.name);
         formDataToSend.append('file', formData.file);
         formDataToSend.append('owner_id', userId.userId);
-      
-        // const response = await fetch(`https://universitymarketplace-backend.onrender.com/notes/`, {
-        //   method: 'POST',
-        //   body: formDataToSend,
-        // });
 
-        const response = await fetch(`http://localhost:8000/notes/`, {
+        console.log('Datos a enviar:', formData);
+
+        const response = await fetch('http://localhost:8000/notes/', {
           method: 'POST',
           body: formDataToSend,
         });
@@ -83,7 +81,7 @@ const CreateProductPage = () => {
         if (response.status === 413) {
           throw new Error('Archivo demasiado grande');
         }
-      
+
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           throw new Error(errorData.detail || 'Error al crear el apunte');
@@ -99,7 +97,7 @@ const CreateProductPage = () => {
 
         const response = await fetch(`http://localhost:8000/tutoring-sessions/?tutor_id=${userId.userId}`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(tutoringData)
         });
 
@@ -117,15 +115,15 @@ const CreateProductPage = () => {
   return (
     <div className="create-product-container">
       <h1>Crear Nuevo Producto</h1>
-      
+
       <div className="product-type-selector">
-        <button 
+        <button
           className={`type-button ${productType === 'note' ? 'active' : ''}`}
           onClick={() => setProductType('note')}
         >
           Apunte
         </button>
-        <button 
+        <button
           className={`type-button ${productType === 'tutoring' ? 'active' : ''}`}
           onClick={() => setProductType('tutoring')}
         >
@@ -140,10 +138,10 @@ const CreateProductPage = () => {
           <label>Curso:</label>
           <Select
             options={courses.map(course => ({
-              value: course.name,
+              value: { code: course.code, name: course.name },
               label: `${course.code} - ${course.name}`
             }))}
-            value={{ value: formData.course, label: courses.find(c => c.name === formData.course)?.name }}
+            value={formData.course ? { value: formData.course, label: `${formData.course.code} - ${formData.course.name}` } : null}
             onChange={(option) => handleInputChange({
               target: { name: 'course', value: option.value }
             })}
