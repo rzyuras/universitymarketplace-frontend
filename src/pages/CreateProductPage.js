@@ -33,7 +33,16 @@ const CreateProductPage = () => {
         const response = await fetch(`${API_URL}/courses/`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        if (!response.ok) throw new Error('Error al cargar cursos');
+        if (!response.ok) {
+          let errorMessage = 'Error desconocido al cargar cursos';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorMessage;
+          } catch {
+            // Mantener el mensaje de error por defecto
+          }
+          throw new Error('Error al cargar cursos');
+        }
         const data = await response.json();
         setCourses(data);
       } catch (err) {
@@ -71,6 +80,7 @@ const CreateProductPage = () => {
     try {
       const tokenClaims = await getIdTokenClaims();
       const token = tokenClaims?.__raw;
+      let response;
       if (productType === 'note') {
         const formDataToSend = new FormData();
         formDataToSend.append('title', formData.title);
@@ -78,22 +88,13 @@ const CreateProductPage = () => {
         formDataToSend.append('file', formData.file);
         formDataToSend.append('owner_id', userId.userId);
 
-        const response = await fetch(`${API_URL}/notes/`, {
+        response = await fetch(`${API_URL}/notes/`, {
           method: 'POST',
           body: formDataToSend,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
-        if (response.status === 413) {
-          throw new Error('Archivo demasiado grande');
-        }
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.detail || 'Error al crear el apunte');
-        }
       } else {
         const tutoringData = {
           course: formData.course.code,
@@ -104,9 +105,7 @@ const CreateProductPage = () => {
           tutor_id: userId.userId
         };
 
-        console.log('Datos a enviar:', JSON.stringify(tutoringData));
-
-        const response = await fetch(`${API_URL}/tutoring-sessions/?tutor_id=${userId.userId}`, {
+        response = await fetch(`${API_URL}/tutoring-sessions/?tutor_id=${userId.userId}`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json', 
@@ -114,13 +113,16 @@ const CreateProductPage = () => {
           },
           body: JSON.stringify(tutoringData)
         });
-
-        if (!response.ok) throw new Error('Error al crear la tutoría');
+      }
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || 'Error desconocido al crear el producto');
+        return;
       }
 
       navigate('/marketplace');
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Error desconocido');
     } finally {
       setIsSubmitting(false);
     }
@@ -170,6 +172,7 @@ const CreateProductPage = () => {
             <div className="form-group">
               <label htmlFor='title'>Título:</label>
               <input
+                id='title'
                 type="text"
                 name="title"
                 value={formData.title}
@@ -180,6 +183,7 @@ const CreateProductPage = () => {
             <div className="form-group file-input-group">
               <label htmlFor='file'>Archivo:</label>
               <input
+                id='file'
                 type="file"
                 name="file"
                 onChange={handleFileChange}
@@ -198,6 +202,7 @@ const CreateProductPage = () => {
             <div className="form-group">
               <label htmlFor='description'>Descripción:</label>
               <textarea
+                id='description'
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}

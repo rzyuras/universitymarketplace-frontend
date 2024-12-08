@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
-import CreateProductPage from '../components/CreateProductPage';
+import CreateProductPage from '../pages/CreateProductPage';
 
 // Mock de Auth0
 jest.mock('@auth0/auth0-react');
@@ -24,9 +24,10 @@ describe('CreateProductPage Component', () => {
 
     // Simula un usuario autenticado
     mockedUseAuth0.mockReturnValue({
-      user: { name: 'testuser', email: 'testuser@example.com' },
+      user: { name: 'ejemplo@uc.cl', email: 'ejemplo@uc.cl' },
       isAuthenticated: true,
       isLoading: false,
+      getIdTokenClaims: jest.fn(() => Promise.resolve({ __raw: 'mock-token' })), // Mock de getIdTokenClaims
     });
 
     // Mock de navigate
@@ -51,16 +52,17 @@ describe('CreateProductPage Component', () => {
         <CreateProductPage />
       </BrowserRouter>
     );
-
+  
     // Simula rellenar el título
     fireEvent.change(screen.getByLabelText(/Título:/i), { target: { value: 'Nuevo Apunte' } });
     expect(screen.getByDisplayValue('Nuevo Apunte')).toBeInTheDocument();
-
+  
     // Simula seleccionar un archivo
     const file = new File(['dummy content'], 'example.pdf', { type: 'application/pdf' });
     fireEvent.change(screen.getByLabelText(/Archivo:/i), { target: { files: [file] } });
     expect(screen.getByText('Archivo seleccionado: example.pdf')).toBeInTheDocument();
   });
+  
 
   test('handles form submission and navigation on success', async () => {
     fetch.mockResolvedValueOnce({ ok: true }); // Simula una respuesta exitosa
@@ -93,24 +95,23 @@ describe('CreateProductPage Component', () => {
   });
 
   test('shows an error message when submission fails', async () => {
-    fetch.mockResolvedValueOnce({ ok: false, status: 400 });
-
+    fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: jest.fn(() => Promise.resolve({ detail: 'Error al crear el apunte' })),
+    });
+  
     render(
       <BrowserRouter>
         <CreateProductPage />
       </BrowserRouter>
     );
-
-    // Simula rellenar el título
+  
     fireEvent.change(screen.getByLabelText(/Título:/i), { target: { value: 'Nuevo Apunte' } });
-
-    // Simula seleccionar un archivo
     const file = new File(['dummy content'], 'example.pdf', { type: 'application/pdf' });
     fireEvent.change(screen.getByLabelText(/Archivo:/i), { target: { files: [file] } });
-
-    // Simula el envío del formulario
     fireEvent.click(screen.getByRole('button', { name: /Crear Apunte/i }));
-
+  
     await waitFor(() => {
       expect(screen.getByText(/Error al crear el apunte/i)).toBeInTheDocument();
     });
