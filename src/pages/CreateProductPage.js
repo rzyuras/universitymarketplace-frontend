@@ -66,12 +66,9 @@ const CreateProductPage = () => {
       if (productType === 'note') {
         const formDataToSend = new FormData();
         formDataToSend.append('title', formData.title);
-        formDataToSend.append('course_code', formData.course.code);
-        formDataToSend.append('course_name', formData.course.name);
+        formDataToSend.append('course_id', formData.course.code);
         formDataToSend.append('file', formData.file);
         formDataToSend.append('owner_id', userId.userId);
-
-        console.log('Datos a enviar:', formData);
 
         const response = await fetch('http://localhost:8000/notes/', {
           method: 'POST',
@@ -88,12 +85,15 @@ const CreateProductPage = () => {
         }
       } else {
         const tutoringData = {
-          course: formData.course,
+          course: formData.course.code,
           start_time: formData.start_time,
           end_time: formData.end_time,
           description: formData.description,
-          location: formData.location
+          location: formData.location,
+          tutor_id: userId.userId
         };
+
+        console.log('Datos a enviar:', JSON.stringify(tutoringData));
 
         const response = await fetch(`http://localhost:8000/tutoring-sessions/?tutor_id=${userId.userId}`, {
           method: 'POST',

@@ -101,7 +101,7 @@ const ProductCard = ({ item, type, onViewDetails }) => {
     <div className="product-card">
       <img 
         src={type === 'tutor' ? '/tutoring.png' : '/notes.png'} 
-        alt={type === 'tutor' ? `Tutoría de ${item.course.name}` : item.title}
+        alt={type === 'tutor' ? `Tutoría de ${item.course}` : item.title}
         className="product-image"
       />
       <div className="product-info">
@@ -109,10 +109,10 @@ const ProductCard = ({ item, type, onViewDetails }) => {
           {type === 'tutor' ? 'Tutoría' : 'Apunte'}
         </span>
         <h3 className="product-title">
-          {type === 'tutor' ? `Tutoría de ${item.course.name}` : item.title}
+          {type === 'tutor' ? `Tutoría de ${item.course}` : item.title}
         </h3>
         <div className="product-details">
-          <p>Curso: {item.course.name}</p>
+          <p>Curso: {type == 'tutor' ? item.course : item.course.name}</p>
           <p>
             {type === 'tutor' 
               ? `Fecha: ${formatDate(item.start_time)}`
