@@ -3,6 +3,7 @@ import { useUser } from '../hooks/useUser';
 import './NotesModal.css';
 import { Trash2, Download, Pencil } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
+import Select from 'react-select';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -11,8 +12,34 @@ const EditNoteModal = ({ note, onClose, onSave }) => {
     title: note.title,
     course: { code: note.course.code, name: note.course.name },
     file: null,
+    fileName: note.file_path ? note.file_path.split('/').pop() : null, // Obtiene el nombre del archivo actual
   });
+  const [courses, setCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(true);
   const { getIdTokenClaims } = useAuth0();
+
+  // Cargar los cursos desde la API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const tokenClaims = await getIdTokenClaims();
+        const token = tokenClaims?.__raw;
+        const response = await fetch(`${API_URL}/courses/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error('Error al cargar los cursos');
+        const data = await response.json();
+        setCourses(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+    fetchCourses();
+  }, [getIdTokenClaims]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,24 +87,49 @@ const EditNoteModal = ({ note, onClose, onSave }) => {
             />
           </div>
           <div className="form-group">
-            <label>Curso (Código - Nombre):</label>
-            <input
-              type="text"
-              value={`${formData.course.code} - ${formData.course.name}`}
-              onChange={(e) => {
-                const [code, ...nameParts] = e.target.value.split(' - ');
-                setFormData({ ...formData, course: { code, name: nameParts.join(' ') } });
-              }}
-              required
-            />
+            <label>Curso:</label>
+            {loadingCourses ? (
+              <p>Cargando cursos...</p>
+            ) : (
+              <Select
+                options={courses.map((course) => ({
+                  value: { code: course.code, name: course.name },
+                  label: `${course.code} - ${course.name}`,
+                }))}
+                value={{
+                  value: formData.course,
+                  label: `${formData.course.code} - ${formData.course.name}`,
+                }}
+                onChange={(option) =>
+                  setFormData({
+                    ...formData,
+                    course: option.value,
+                  })
+                }
+                placeholder="Selecciona un curso..."
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            )}
           </div>
           <div className="form-group">
             <label>Archivo (opcional):</label>
             <input
               type="file"
-              onChange={(e) => setFormData({ ...formData, file: e.target.files[0] })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  file: e.target.files[0],
+                  fileName: e.target.files[0]?.name || formData.fileName,
+                })
+              }
               accept=".pdf,.doc,.docx"
             />
+            {formData.fileName && (
+              <div className="selected-file">
+                Archivo actual: <strong>{formData.fileName}</strong>
+              </div>
+            )}
           </div>
           <div className="form-actions">
             <button type="submit" className="save-button">Guardar</button>
@@ -113,13 +165,11 @@ const NotesModal = ({ onClose }) => {
     try {
       const tokenClaims = await getIdTokenClaims();
       const token = tokenClaims?.__raw;
-      const response = await fetch(`${API_URL}/notes/my-notes?${params}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/notes/my-notes?${params}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error('Error al obtener los apuntes');
       const data = await response.json();
       setNotes(data);
@@ -144,7 +194,7 @@ const NotesModal = ({ onClose }) => {
       });
 
       if (!response.ok) throw new Error('Error al eliminar el apunte');
-      setNotes(notes.filter(note => note.id !== noteId));
+      setNotes(notes.filter((note) => note.id !== noteId));
     } catch (err) {
       setError(err.message);
     }
@@ -163,7 +213,7 @@ const NotesModal = ({ onClose }) => {
   };
 
   const handleSaveEdit = (updatedNote) => {
-    setNotes(notes.map(note => note.id === updatedNote.id ? updatedNote : note));
+    setNotes(notes.map((note) => (note.id === updatedNote.id ? updatedNote : note)));
   };
 
   return (
@@ -197,8 +247,12 @@ const NotesModal = ({ onClose }) => {
                   </div>
                 </div>
                 <div className="note-info">
-                  <p><strong>Curso:</strong> {note.course.code} - {note.course.name}</p>
-                  <p><strong>Fecha:</strong> {new Date(note.upload_date).toLocaleDateString()}</p>
+                  <p>
+                    <strong>Curso:</strong> {note.course.code} - {note.course.name}
+                  </p>
+                  <p>
+                    <strong>Fecha:</strong> {new Date(note.upload_date).toLocaleDateString()}
+                  </p>
                 </div>
                 <button
                   className="download-button"
