@@ -409,28 +409,31 @@ const MarketplacePage = () => {
       ...products.tutorings.map(item => ({ item, type: 'tutor' })),
       ...products.notes.map(item => ({ item, type: 'note' }))
     ];
-
+  
     // Filtrar por tipo
     if (filters.type !== 'all') {
       filtered = filtered.filter(p => p.type === filters.type);
     }
-
+  
     // Filtrar por curso
     if (filters.course.name && typeof filters.course.name === 'string') {
-      filtered = filtered.filter(p => 
-        p.item.course.name && p.item.course.name.toLowerCase().includes(filters.course.name.toLowerCase())
-      );
+      filtered = filtered.filter((p) => {
+        // Caso apuntes: course es un diccionario
+        if (p.type === 'note' && p.item.course && p.item.course.name) {
+          return p.item.course.name.toLowerCase().includes(filters.course.name.toLowerCase());
+        }
+        // Caso tutorías: course es un string
+        if (p.type === 'tutor' && typeof p.item.course === 'string') {
+          return p.item.course.toLowerCase().includes(filters.course.name.toLowerCase());
+        }
+        return false;
+      });
     }
-
-    // Filtrar por título (búsqueda simple)
-    //if (filters.search && typeof filters.search === 'string' && filters.search.trim()) {
-      //filtered = filtered.filter(p => 
-        //p.item.title && p.item.title.toLowerCase().includes(filters.search.trim().toLowerCase())
-      //);
-    //}
-
+  
+    console.log("Productos filtrados:", filtered); // Depuración
     return filtered;
-};
+  };
+  
 
   return (
     <div className="marketplace-container">
@@ -448,12 +451,21 @@ const MarketplacePage = () => {
 
         <input
           type="text"
-          name="course"
+          name="name" // Asegúrate de que este "name" coincide con el atributo dentro de "filters.course"
           placeholder="Buscar por curso..."
           value={filters.course.name}
-          onChange={handleFilterChange}
+          onChange={(e) => {
+            setFilters({
+              ...filters,
+              course: {
+                ...filters.course,
+                name: e.target.value
+              }
+            });
+          }}
           className="filter-input"
         />
+
 
         {/* <input
           type="text"
