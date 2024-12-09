@@ -34,7 +34,7 @@ const CreateProductPage = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (!response.ok) {
-          let errorMessage = 'Error desconocido al cargar cursos';
+          let errorMessage = 'Error desconocido al crear el producto';
           try {
             const errorData = await response.json();
             errorMessage = errorData.detail || errorMessage;
@@ -67,7 +67,7 @@ const CreateProductPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('Usuario a publicar', userId);
+    // console.log('Usuario a publicar', userId);
 
     if (!userId) {
       setError('Error: Usuario no identificado');
@@ -84,6 +84,9 @@ const CreateProductPage = () => {
       if (productType === 'note') {
         const formDataToSend = new FormData();
         formDataToSend.append('title', formData.title);
+        if (!formData.course || !formData.course.code) {
+          throw new Error('El curso no está seleccionado correctamente.');
+        }
         formDataToSend.append('course_id', formData.course.code);
         formDataToSend.append('file', formData.file);
         formDataToSend.append('owner_id', userId.userId);
@@ -115,11 +118,9 @@ const CreateProductPage = () => {
         });
       }
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        setError(errorData.detail || 'Error desconocido al crear el producto');
-        return;
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Error desconocido');
       }
-
       navigate('/marketplace');
     } catch (err) {
       setError(err.message || 'Error desconocido');
@@ -135,7 +136,10 @@ const CreateProductPage = () => {
       <div className="product-type-selector">
         <button
           className={`type-button ${productType === 'note' ? 'active' : ''}`}
-          onClick={() => setProductType('note')}
+          onClick={() => {
+            setProductType('note');
+            setError(null);
+          }}
         >
           Apunte
         </button>
@@ -147,7 +151,7 @@ const CreateProductPage = () => {
         </button>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message">{error || ''}</div>}
 
       <form onSubmit={handleSubmit} className="create-product-form">
         <div className="form-group">
