@@ -247,3 +247,189 @@
   .schedule-button:hover {
     background-color: #1565c0;
   }
+
+  .filters-section {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .filter-select,
+  .filter-input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 200px;
+    font-size: 0.9rem;
+  }
+  
+  .filter-select:focus,
+  .filter-input:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+  }
+  
+  .no-products-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #666;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+
+  /* Estilos del modal de calificación */
+.rating-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+.rating-modal {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.rating-modal h3 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.stars-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.star {
+  font-size: 35px;
+  cursor: pointer;
+  color: #ddd;
+  transition: all 0.2s;
+}
+
+.star:hover, .star.filled {
+  color: #ffc107;
+  transform: scale(1.1);
+}
+
+.comment-input {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 20px 0;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.rating-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.rating-actions button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.rating-actions button:first-child {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+}
+
+.rating-actions button:last-child {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+/* Estilos de la sección de calificaciones */
+.ratings-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.average-rating {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.stars {
+  font-size: 24px;
+  color: #ffc107;
+  letter-spacing: 4px;
+  margin-right: 10px;
+}
+
+.rating-count {
+  color: #666;
+  font-size: 14px;
+}
+
+.rate-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  margin: 15px 0;
+}
+
+.comments-section {
+  margin-top: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.comment {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.comment p {
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.comment small {
+  color: #666;
+  font-style: italic;
+}

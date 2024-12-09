@@ -4,10 +4,17 @@ import { API_URL } from '../config';
 
 const ItemList = () => {
   const [items, setItems] = useState([]);
+  const { getIdTokenClaims } = useAuth0();
 
   useEffect(() => {
     const fetchItems = async () => {
-      const response = await axios.get(`${API_URL}/items`);
+      const tokenClaims = await getIdTokenClaims();
+      const token = tokenClaims?.__raw;
+      const response = await axios.get(`${API_URL}/items`,
+        { headers: { 
+          Authorization: `Bearer ${token}` 
+        }}
+      );
       setItems(response.data);
     };
     fetchItems();
