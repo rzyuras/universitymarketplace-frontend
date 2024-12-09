@@ -335,14 +335,15 @@
 }
 
 .comment-input {
-  width: 100%;
+  width: calc(100% - 24px); /* Asegura que respete el padding del modal */
   min-height: 100px;
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  margin: 20px 0;
+  margin: 20px auto; /* Centra el input */
   font-size: 14px;
   resize: vertical;
+  box-sizing: border-box; /* Incluye el padding en el ancho total */
 }
 
 .rating-actions {
